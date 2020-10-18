@@ -1,0 +1,122 @@
+server:
+  port: 8888
+  servlet:
+    path: /dap
+
+spring:
+  application:
+    name: bd-data-asset-platform-service-dev
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+  #数据库配置
+  datasource:
+#    url: jdbc:mysql://192.168.226.139:3306/xxl-job?useUnicode=true&useSSL=false&characterEncoding=utf-8
+#    username: root
+#    password: '1234'
+    url: jdbc:mysql://192.168.235.3:3306/xxl-job?useUnicode=true&useSSL=false&characterEncoding=utf-8
+    username: bigdata
+    password: 'bluemoon2018#'
+    # 使用druid数据源
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.jdbc.Driver
+    filters: stat
+    maxActive: 5
+    initialSize: 1
+    maxWait: 60000
+    minIdle: 1
+    timeBetweenEvictionRunsMillis: 60000
+    minEvictableIdleTimeMillis: 300000
+    validationQuery: "SELECT 'x'"
+    testWhileIdle: false
+    testOnBorrow: false
+    testOnReturn: false
+    maxOpenPreparedStatements: 10
+    removeAbandoned: true
+    removeAbandonedTimeout: 1800
+    logAbandoned: true
+    poolPreparedStatements: true
+    keepAlive: true
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+  messages:
+    encoding: UTF-8
+    basename: message/messages_zh
+  cache:
+    type: ehcache
+    ehcache:
+      config: classpath:/ehcache.xml
+
+# Logger Config
+logging:
+  level:
+    cn.com.bluemoon.dap: debug
+mybatis-plus:
+  typeEnumsPackage: cn.com.bluemoon.dap.enums
+  global-config:
+    db-config:
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+      id-type: id_worker_str
+  # 扫描 mapper.xml
+  mapper-locations: classpath:/mapper/*Mapper.xml
+  configuration:
+    jdbc-type-for-null: 'null'
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://192.168.243.21:9001/eureka/
+  instance:
+    lease-expiration-duration-in-seconds: 30
+    lease-renewal-interval-in-seconds: 10
+    prefer-ip-address: true
+    metadata-map:
+      weight: 11
+
+hystrix:
+  command:
+    default:
+      circuitBreaker:
+        sleepWindowInMilliseconds: 100000
+        forceClosed: true
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 6000
+  shareSecurityContext: true
+
+feign:
+  hystrix:
+    enabled: true
+
+cors:
+  access:
+    control:
+      maxAge: 7200
+
+
+# 自定义 配置变量
+bm:
+  dap:
+    appName: 数据资产管理平台
+    exception:
+      send-webhook: false
+      send-mails:
+        -
+    constant-map:
+      - 1 == '1'
+      - l == 1
+    file:
+      standard-allow-suffix:
+        - .xls
+        - .xlsx
+      save: true
+      dir-date-format: yyyy/MM/dd
+      #      ${bm.dap.file.dir-date-format}
+      save-base-path: /data/bd-data-asset-platform-service/dap-standard-upload-file/store
+      #     s 秒 min 分 h 时 d 天 m 月 y 年 TDB
+      ttl: -1
+      ttl-cron-timer: '*/5 * * * * ?'
+      save-file-temp-dir: /data/bd-data-asset-platform-service/dap-standard-upload-file/fileTemp/store
